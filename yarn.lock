@@ -6947,7 +6947,7 @@ workbox-cacheable-response@7.3.0:
   dependencies:
     workbox-core "7.3.0"
 
-workbox-core@7.3.0:
+workbox-core@7.3.0, workbox-core@^7.3.0:
   version "7.3.0"
   resolved "https://registry.yarnpkg.com/workbox-core/-/workbox-core-7.3.0.tgz#f24fb92041a0b7482fe2dd856544aaa9fa105248"
   integrity sha512-Z+mYrErfh4t3zi7NVTvOuACB0A/jA3bgxUN3PwtAVHvfEsZxV9Iju580VEETug3zYJRc0Dmii/aixI/Uxj8fmw==
@@ -6977,7 +6977,7 @@ workbox-navigation-preload@7.3.0:
   dependencies:
     workbox-core "7.3.0"
 
-workbox-precaching@7.3.0:
+workbox-precaching@7.3.0, workbox-precaching@^7.3.0:
   version "7.3.0"
   resolved "https://registry.yarnpkg.com/workbox-precaching/-/workbox-precaching-7.3.0.tgz#a84663d69efdb334f25c04dba0a72ed3391c4da8"
   integrity sha512-ckp/3t0msgXclVAYaNndAGeAoWQUv7Rwc4fdhWL69CCAb2UHo3Cef0KIUctqfQj1p8h6aGyz3w8Cy3Ihq9OmIw==
@@ -7005,7 +7005,7 @@ workbox-recipes@7.3.0:
     workbox-routing "7.3.0"
     workbox-strategies "7.3.0"
 
-workbox-routing@7.3.0:
+workbox-routing@7.3.0, workbox-routing@^7.3.0:
   version "7.3.0"
   resolved "https://registry.yarnpkg.com/workbox-routing/-/workbox-routing-7.3.0.tgz#fc86296bc1155c112ee2c16b3180853586c30208"
   integrity sha512-ZUlysUVn5ZUzMOmQN3bqu+gK98vNfgX/gSTZ127izJg/pMMy4LryAthnYtjuqcjkN4HEAx1mdgxNiKJMZQM76A==

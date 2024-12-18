@@ -16,7 +16,10 @@
     "typescript": "^5.7.2",
     "vue": "latest",
     "vue-router": "latest",
-    "vue-tsc": "^2.1.10"
+    "vue-tsc": "^2.1.10",
+    "workbox-core": "^7.3.0",
+    "workbox-precaching": "^7.3.0",
+    "workbox-routing": "^7.3.0"
   },
   "packageManager": "yarn@1.22.22+sha1.ac34549e6aa8e7ead463a7407e1c7390f61a6610"
 }
