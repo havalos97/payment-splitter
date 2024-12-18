@@ -34,24 +34,28 @@ export default defineNuxtConfig({
   modules: ['@vite-pwa/nuxt'],
   pwa: {
     manifest: {
-      "short_name": "MDN",
-      "name": "MDN Web Docs",
-      "icons": [
+      name: 'Repartir gastos',
+      short_name: 'Repartir gastos',
+      description: 'PWA que facilita el repartir gastos entre amigos',
+      lang: 'es',
+      display: 'standalone',
+      background_color: '#ffffff',
+      theme_color: '#bda8ff',
+      start_url: '/',
+      icons: [
         {
-          "src": "/android-chrome-192x192.png",
-          "sizes": "192x192",
-          "type": "image/png"
+          src: '/android-chrome-192x192.png',
+          sizes: '192x192',
         },
         {
-          "src": "/android-chrome-512x512.png",
-          "sizes": "512x512",
-          "type": "image/png"
-        }
+          src: '/android-chrome-512x512.png',
+          sizes: '512x512',
+        },
+        {
+          src: '/apple-touch-icon.png',
+          sizes: '512x512',
+        },
       ],
-      "start_url": ".",
-      "display": "standalone",
-      "theme_color": "#000000",
-      "background_color": "#ffffff"
-    }    
+    },
   },
 })
