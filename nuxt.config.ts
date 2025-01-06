@@ -28,60 +28,47 @@ export default defineNuxtConfig({
       autoprefixer: {},
     },
   },
-  vite: {
-    vue: {
-      template: {},
-    },
-    plugins: [
-      VitePWA({
-        registerType: 'autoUpdate',
-        devOptions: {
-          enabled: true,
-        },
-        manifest: {
-          name: 'Repartir gastos',
-          short_name: 'PaySplit',
-          description: 'App que facilita el repartir gastos entre amigos',
-          lang: 'es',
-          start_url: '/',
-          display: 'standalone', // Ensures the app behaves like a native app
-          background_color: '#ffffff',
-          theme_color: '#ffffff',
-          icons: [
-            {
-              src: '/android-chrome-192x192.png',
-              sizes: '192x192',
-              type: 'image/png',
-            },
-            {
-              src: '/android-chrome-512x512.png',
-              sizes: '512x512',
-              type: 'image/png',
-            },
-          ],
-        },
-        workbox: {
-          runtimeCaching: [
-            {
-              urlPattern: ({ request }) =>
-                request.destination === 'document' || request.destination === 'script',
-              handler: 'NetworkFirst',
-            },
-            {
-              urlPattern: ({ request }) => request.destination === 'image',
-              handler: 'CacheFirst',
-              options: {
-                cacheName: 'images-cache',
-                expiration: {
-                  maxEntries: 50,
-                  maxAgeSeconds: 30 * 24 * 60 * 60,
-                },
-              },
-            },
-          ],
-        },
-      }),
-    ],
-  },
   modules: ['@vite-pwa/nuxt'],
+  pwa: {
+    strategies: 'generateSW',
+    injectRegister: 'script',
+    registerType: 'autoUpdate',
+    manifest: {
+      name: 'Repartir gastos',
+      short_name: 'PaySplit',
+      description: 'App que facilita el repartir gastos entre amigos',
+      lang: 'es',
+      start_url: '/',
+      display: 'standalone',
+      background_color: '#ffffff',
+      theme_color: '#ffffff',
+      icons: [
+        { src: '/android-chrome-192x192.png', sizes: '192x192', type: 'image/png' },
+        { src: '/android-chrome-512x512.png', sizes: '512x512', type: 'image/png' },
+      ],
+    },
+    workbox: {
+      navigateFallback: '/',
+      globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
+      runtimeCaching: [
+        {
+          urlPattern: /^https?.*/,
+          handler: 'NetworkFirst',
+          options: {
+            cacheName: 'default-cache',
+            expiration: { maxEntries: 100, maxAgeSeconds: 30 * 24 * 60 * 60 }, // 30 days
+          },
+        },
+      ],
+    },
+    devOptions: {
+      enabled: true,
+      type: 'module',
+      navigateFallback: '/',
+      navigateFallbackAllowlist: [/^\/$/]
+    },
+    client: {
+      installPrompt: true
+    }
+  },
 })
