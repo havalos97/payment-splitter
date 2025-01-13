@@ -41,32 +41,35 @@ export default defineNuxtConfig({
       theme_color: '#f3f4f6',
       icons: [
         {
-          src: '/public/favicon-16x16.png',
-          sizes: '16x16',
-          type: 'image/png'
-        },
-        {
-          src: '/public/favicon-32x32.png',
-          sizes: '32x32',
-          type: 'image/png'
-        },
-        {
-          src: '/public/apple-touch-icon.png',
-          sizes: '180x180',
-          type: 'image/png',
-          purpose: 'apple touch icon'
-        },
-        {
-          src: '/public/android-chrome-192x192.png',
+          src: '/android-chrome-192x192.png',
           sizes: '192x192',
-          type: 'image/png'
+          type: 'image/png',
         },
         {
-          src: '/public/android-chrome-512x512.png',
+          src: '/android-chrome-512x512.png',
           sizes: '512x512',
           type: 'image/png',
-          purpose: 'any maskable'
-        }
+        },
+        {
+          src: '/apple-touch-icon.png',
+          sizes: '180x180',
+          type: 'image/png',
+        },
+        {
+          src: '/favicon-16x16.png',
+          sizes: '16x16',
+          type: 'image/png',
+        },
+        {
+          src: '/favicon-32x32.png',
+          sizes: '32x32',
+          type: 'image/png',
+        },
+        {
+          src: '/favicon.ico',
+          sizes: '64x64',
+          type: 'image/x-icon',
+        },
       ],
     },
     workbox: {
@@ -84,7 +87,7 @@ export default defineNuxtConfig({
           options: {
             cacheName: 'start-url',
             expiration: {
-              maxAgeSeconds: 24 * 60 * 60 // 24 hours
+              maxAgeSeconds: 30 * 24 * 60 * 60 // 24 hours
             }
           }
         },
@@ -106,7 +109,7 @@ export default defineNuxtConfig({
             cacheName: 'assets',
             expiration: {
               maxEntries: 60,
-              maxAgeSeconds: 24 * 60 * 60 // 24 hours
+              maxAgeSeconds: 30 * 24 * 60 * 60 // 30 days
             }
           }
         },
@@ -117,7 +120,7 @@ export default defineNuxtConfig({
             cacheName: 'fonts',
             expiration: {
               maxEntries: 10,
-              maxAgeSeconds: 7 * 24 * 60 * 60 // 7 days
+              maxAgeSeconds: 30 * 24 * 60 * 60 // 30 days
             }
           }
         },
@@ -128,7 +131,7 @@ export default defineNuxtConfig({
             cacheName: 'pages',
             expiration: {
               maxEntries: 30,
-              maxAgeSeconds: 24 * 60 * 60 // 24 hours
+              maxAgeSeconds: 30 * 24 * 60 * 60 // 30 days
             },
             networkTimeoutSeconds: 3
           }

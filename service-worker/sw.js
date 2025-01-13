@@ -31,12 +31,12 @@ workbox.routing.registerRoute(
 // Network first for HTML
 workbox.routing.registerRoute(
   ({request}) => request.mode === 'navigate',
-  new workbox.strategies.NetworkFirst({
+  new workbox.strategies.StaleWhileRevalidate({
     cacheName: 'pages',
     plugins: [
       new workbox.expiration.ExpirationPlugin({
         maxEntries: 30,
-        maxAgeSeconds: 24 * 60 * 60 // 24 hours
+        maxAgeSeconds: 30 * 24 * 60 * 60 // 30 hours
       })
     ]
   })
