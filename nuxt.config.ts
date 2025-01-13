@@ -7,7 +7,7 @@ export default defineNuxtConfig({
   ssr: true,
   app: {
     head: {
-      title: 'Repartir gastos',
+      title: 'PaySplit',
     }
   },
   components: [
@@ -29,46 +29,73 @@ export default defineNuxtConfig({
     },
   },
   modules: ['@vite-pwa/nuxt'],
-  pwa: {
-    strategies: 'generateSW',
-    injectRegister: 'script',
-    registerType: 'autoUpdate',
-    manifest: {
-      name: 'Repartir gastos',
-      short_name: 'PaySplit',
-      description: 'App que facilita el repartir gastos entre amigos',
-      lang: 'es',
-      start_url: '/',
-      display: 'standalone',
-      background_color: '#ffffff',
-      theme_color: '#ffffff',
-      icons: [
-        { src: '/android-chrome-192x192.png', sizes: '192x192', type: 'image/png' },
-        { src: '/android-chrome-512x512.png', sizes: '512x512', type: 'image/png' },
-      ],
-    },
-    workbox: {
-      navigateFallback: '/',
-      globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
-      runtimeCaching: [
-        {
-          urlPattern: /^https?.*/,
-          handler: 'NetworkFirst',
-          options: {
-            cacheName: 'default-cache',
-            expiration: { maxEntries: 100, maxAgeSeconds: 30 * 24 * 60 * 60 }, // 30 days
-          },
+  vite: {
+    plugins: [
+      VitePWA({
+        registerType: 'autoUpdate',
+        devOptions: {
+          enabled: true, // Enables service worker in dev mode for testing
         },
-      ],
-    },
-    devOptions: {
-      enabled: true,
-      type: 'module',
-      navigateFallback: '/',
-      navigateFallbackAllowlist: [/^\/$/]
-    },
-    client: {
-      installPrompt: true
-    }
+        manifest: {
+          name: 'Payment Splitter',
+          short_name: 'PaySplit',
+          description: 'A simple app to split payments',
+          lang: 'en',
+          start_url: '/',
+          display: 'standalone',
+          background_color: '#f3f4f6',
+          theme_color: '#f3f4f6',
+          icons: [
+            {
+              src: '/icon.png',
+              sizes: '192x192',
+              type: 'image/png',
+            },
+            {
+              src: '/icon-512.png',
+              sizes: '512x512',
+              type: 'image/png',
+            },
+          ],
+        },
+        workbox: {
+          runtimeCaching: [
+            {
+              urlPattern: /\/_nuxt\/.*\.js$/, // Cache JS files
+              handler: 'StaleWhileRevalidate',
+              options: {
+                cacheName: 'nuxt-js-cache',
+                expiration: {
+                  maxEntries: 50,
+                  maxAgeSeconds: 86400, // Cache for 1 day
+                },
+              },
+            },
+            {
+              urlPattern: /\/_nuxt\/.*\.css$/, // Cache CSS files
+              handler: 'StaleWhileRevalidate',
+              options: {
+                cacheName: 'nuxt-css-cache',
+                expiration: {
+                  maxEntries: 50,
+                  maxAgeSeconds: 86400, // Cache for 1 day
+                },
+              },
+            },
+            {
+              urlPattern: /\/$/, // Cache the HTML (root route) page
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'html-cache',
+                expiration: {
+                  maxEntries: 10, // Only keep 1 HTML page in the cache
+                  maxAgeSeconds: 86400, // Cache for 1 day
+                },
+              },
+            },
+          ],
+        },
+      }),
+    ],
   },
 })

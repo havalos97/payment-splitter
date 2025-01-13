@@ -1,8 +1,44 @@
 <template>
   <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow">
-    <h2 class="text-2xl font-semibold mb-4">
-      Lista de personas
-    </h2>
+    <div class="grid grid-cols-2 gap-4 mb-4">
+      <div>
+        <h2 class="text-2xl font-semibold mb-4">
+          People list
+        </h2>
+      </div>
+      <div class="flex justify-end">
+        <fab
+          class="bg-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-700"
+          data-tooltip-target="add-person-tooltip"
+          @click="emits('addPerson')"
+        >
+          <plus-icon class="w-6 h-6 text-red" />
+        </fab>
+        <div
+          id="add-person-tooltip"
+          role="tooltip"
+          class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700"
+        >
+          Add person
+          <div class="tooltip-arrow" data-popper-arrow></div>
+        </div>
+        <fab
+          class="bg-gray-400 hover:bg-gray-500 dark:bg-gray-400 dark:hover:bg-gray-700"
+          data-tooltip-target="share-tooltip"
+          @click="share"
+        >
+          <share-nodes-icon class="w-6 h-6 text-red" />
+        </fab>
+        <div
+          id="share-tooltip"
+          role="tooltip"
+          class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700"
+        >
+          Share link
+          <div class="tooltip-arrow" data-popper-arrow></div>
+        </div>
+      </div>
+    </div>
     <div
       v-for="(person, index) in people"
       :key="index"
@@ -10,59 +46,112 @@
     >
       <input
         v-model="person.name"
-        placeholder="Nombre"
+        placeholder="Name"
         class="border rounded p-2 flex-1 min-w-[150px]"
         type="text"
         maxlength="25"
       />
       <div class="flex">
         <span class="inline-flex items-center px-3 text-sm text-gray-400 bg-gray-100 border rounded-e-0 border-gray-200 border-e-0 rounded-s-md dark:bg-gray-100 dark:text-gray-400 dark:border-gray-200">
-          <svg class="w-6 h-6 text-black dark:text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 17.345a4.76 4.76 0 0 0 2.558 1.618c2.274.589 4.512-.446 4.999-2.31.487-1.866-1.273-3.9-3.546-4.49-2.273-.59-4.034-2.623-3.547-4.488.486-1.865 2.724-2.899 4.998-2.31.982.236 1.87.793 2.538 1.592m-3.879 12.171V21m0-18v2.2"/>
-          </svg>
+          <dollar-icon class="w-6 h-6 text-black dark:text-black" />
         </span>
         <input
           v-model.number="person.amount"
-          placeholder="Cantidad (MXN)"
+          placeholder="Amount"
           class="border rounded p-2 w-full md:w-36"
           type="number"
           min="0"
           @keydown="formatAmount"
         />
-        <fab @click="emits('removePerson', index)">
-          <trash-icon class="w-4 h-4 text-white" />
+        <fab
+          class="bg-red-600 hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-700"
+          @click="deletePersonAction(index)"
+        >
+          <trash-icon class="w-6 h-6 text-white" />
         </fab>
       </div>
     </div>
-    <cta @click="emits('addPerson')">
-      Añadir persona
-    </cta>
     <div class="mt-4 text-lg font-semibold">
-      Total: <span class="text-green-600">${{ total }}</span> MXN
+      Total: <span class="text-green-600">${{ total }}</span>
     </div>
-    <cta full-width @click="emits('calculateDebts')">
-      Calcular
+    <cta class="my-4" @click="emits('calculateDebts')" full-width>
+      Calculate
     </cta>
-    <cta-outlined @click="emits('reset', true)">
-      Limpiar datos
+    <cta-outlined class="my-4" @click="showResetConfirmationModal = true" full-width>
+      Clear all
     </cta-outlined>
   </div>
+  <confirmation-modal
+    v-if="showResetConfirmationModal"
+    :message="confirmWipeMessage"
+    yesText="Yes"
+    noText="No"
+    @confirm="confirmReset"
+    @close="showResetConfirmationModal = false"
+  />
+  <confirmation-modal
+    v-if="showConfirmDeleteModal"
+    :message="confirmDeleteMessage"
+    yesText="Yes"
+    noText="No"
+    @confirm="confirmDeletePerson"
+    @close="showConfirmDeleteModal = false"
+  />
 </template>
 
 <script lang="ts" setup>
-import type { Person } from '~/types';
+import type { PaymentsFormComponentProps } from '~/types/payments-form.types';
+import { initFlowbite } from 'flowbite';
+import { ToastPosition } from '~/types/toast.types';
 
 const emits = defineEmits([
   'reset',
   'calculateDebts',
   'addPerson',
-  'removePerson'
+  'removePerson',
+  'stateFromQuery',
 ]);
 
-const props = defineProps<{
-  people: Person[];
-  total: number;
-}>();
+const props = defineProps<PaymentsFormComponentProps>();
+
+const route = useRoute();
+const router = useRouter();
+const { isSm } = useDevice();
+const {
+  showToast,
+  setToastMessage,
+  setToastPosition,
+  setToastTimeout,
+} = useToast();
+
+const showConfirmDeleteModal = ref(false);
+const showResetConfirmationModal = ref(false);
+const selectedPersonIndex = ref(-1);
+
+const selectedPersonName = computed(() => props.people.at(selectedPersonIndex.value)?.name);
+const confirmDeleteMessage = computed(() =>
+  `Are you sure you want to remove ${selectedPersonName.value} from the list?`,
+);
+const confirmWipeMessage = "This will remove all people from the list. Are you sure?";
+
+const deletePersonAction = (index: number) => {
+  selectedPersonIndex.value = index;
+  if (selectedPersonName.value) {
+    showConfirmDeleteModal.value = true;
+  } else {
+    confirmDeletePerson();
+  }
+};
+
+const confirmDeletePerson = () => {
+  emits('removePerson', selectedPersonIndex.value);
+  showConfirmDeleteModal.value = false;
+};
+
+const confirmReset = () => {
+  emits('reset', true);
+  showResetConfirmationModal.value = false;
+};
 
 const total = computed(() =>
   props.people.reduce(
@@ -75,4 +164,54 @@ const formatAmount = (e: KeyboardEvent) =>
   e.key.length === 1 &&
   isNaN(Number(e.key)) &&
   e.preventDefault();
+
+watch(
+  () => props.people.map(
+    (person) => ({ ...person })
+  ),
+  (newPeople) => {
+    const query = route.query;
+    let state = {
+      people: newPeople,
+      total: total.value,
+    };
+    // If there is a state in the query, merge it with the current state
+    if ('state' in query) {
+      const stateFromQuery = decodeQueryData(query.state as string);
+      state = {
+        ...stateFromQuery,
+        ...state,
+      }
+    }
+    const encodedState = encodeQueryData(state);
+    router.push({
+      query: { state: encodedState },
+    });
+  },
+  { deep: true },
+);
+
+const share = () => {
+  const state = route.query.state;
+  let baseURL = `${window.location.origin}${window.location.pathname}`;
+  if (state) {
+    baseURL = `${baseURL}?state=${state}`
+  }
+  navigator.clipboard.writeText(baseURL);
+  setToastMessage('Link copied to clipboard');
+  setToastPosition(
+    isSm.value
+      ? ToastPosition.bottomFullWidth
+      : ToastPosition.bottomRight,
+  );
+  setToastTimeout(5);
+  showToast();
+}
+
+onMounted(() => {
+  initFlowbite();
+  if (route.query.state) {
+    emits('stateFromQuery', route.query.state as string);
+  }
+});
 </script>

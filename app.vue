@@ -1,8 +1,8 @@
 <template>
   <VitePwaManifest />
-  <div class="min-h-screen bg-gray-50 p-6">
+  <div class="min-h-screen print:bg-transparent bg-gray-100 p-6">
     <h1 class="text-3xl font-bold text-center mb-4">
-      Repartir gastos
+      PaySplit
     </h1>
     <payments-form
       v-if="!showResults"
@@ -12,45 +12,48 @@
       @remove-person="removePerson"
       @calculate-debts="calculateDebts"
       @reset="reset"
+      @state-from-query="setStateFromQuery"
     />
     <payment-results
       v-else
       :results="results"
-      @reset="reset"
+      @reset="reset(false)"
     />
+    <Transition name="fade">
+      <toast
+        v-if="show"
+        :message="message ?? ''"
+        :position="position ?? ToastPosition.bottomCenter"
+        @close="hideToast"
+      />
+    </Transition>
   </div>
 </template>
 
 <script lang="ts" setup>
 import type { DebtorType, Person } from './types';
+import { ToastPosition } from './types/toast.types';
 
 const initialPersonData = () => ({
   name: "",
   amount: 0,
-});
+} as Person);
 
-const confirmWipeMessage = "Estas a punto de borrar todos los datos, ¿estás seguro?";
-const confirmDeleteMessage = "Estas a punto de borrar a esta persona, ¿estás seguro?";
 const people = ref<Person[]>([
   initialPersonData(),
 ]);
 const showResults = ref(false);
 const results = ref<DebtorType[]>([]);
 
+const { show, message, position, hideToast } = useToast();
+
 const addPerson = () => {
   people.value.push(initialPersonData());
 };
 
-const formater = (amount: number) => Intl.NumberFormat("es-MX", {
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
-}).format(amount)
-
 const removePerson = (index: number) => {
   if (people.value.length === 1) return;
-  if (window.confirm(confirmDeleteMessage)) {
-    people.value.splice(index, 1);
-  }
+  people.value.splice(index, 1);
 };
 
 const total = computed(() =>
@@ -61,57 +64,25 @@ const total = computed(() =>
 );
 
 const calculateDebts = () => {
-  // Removes empty names from people list
-  people.value = people.value.filter((person) => person.name.trim() !== "");
-  const totalSpent = total.value;
-  const numberOfPeople = people.value.length;
-
-  if (numberOfPeople < 2 || totalSpent === 0) return;
-
-  const share = totalSpent / numberOfPeople;
-
-  const balances = people.value.map((person, idx) => ({
-    name: person.name || `Persona ${idx + 1}`,
-    balance: (person.amount || 0) - share,
-  }));
-
-  const creditors = balances.filter((p) => p.balance > 0);
-  const debtors = balances.filter((p) => p.balance < 0);
-
-  const debtList = debtors.reduce((acc, debtor) => {
-    if (debtor.balance === 0) return acc;
-
-    creditors.reduce((_, creditor) => {
-      if (debtor.balance === 0) return acc;
-
-      const amount = Math.min(Math.abs(debtor.balance), creditor.balance);
-
-      if (amount > 0) {
-        acc.push({
-          from: debtor.name,
-          to: creditor.name,
-          amount: formater(amount),
-        });
-
-        debtor.balance += amount;
-        creditor.balance -= amount;
-      }
-
-      return acc;
-    }, acc);
-
-    return acc;
-  }, [] as DebtorType[]);
-
-  results.value = debtList;
+  const debtors = getDebtorList({
+    people: people.value,
+    total: total.value,
+  });
+  if (!debtors) return;
+  results.value = debtors;
   showResults.value = true;
 };
 
 const reset = (wipePeople: boolean) => {
-  if (wipePeople && window.confirm(confirmWipeMessage)) {
+  if (wipePeople) {
     people.value = [initialPersonData()];
     results.value = [];
   }
   showResults.value = false;
+};
+
+const setStateFromQuery = (query: string) => {
+  const state = decodeQueryData(query);
+  people.value = state.people as Person[];
 };
 </script>

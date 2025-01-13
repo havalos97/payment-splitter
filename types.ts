@@ -8,3 +8,8 @@ export type DebtorType = {
   to:     string;
   amount: string;
 };
+
+export type CalculationType = {
+  people:     Person[],
+  totalSpent: number,
+};
