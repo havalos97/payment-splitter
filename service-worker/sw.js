@@ -1,4 +1,3 @@
-// public/sw.js
 importScripts('https://storage.googleapis.com/workbox-cdn/releases/6.5.4/workbox-sw.js');
 
 self.addEventListener('install', (event) => {
@@ -29,7 +28,7 @@ workbox.routing.registerRoute(
   })
 );
 
-// Improved navigation handling
+// Network first for HTML
 workbox.routing.registerRoute(
   ({request}) => request.mode === 'navigate',
   new workbox.strategies.NetworkFirst({
@@ -38,32 +37,7 @@ workbox.routing.registerRoute(
       new workbox.expiration.ExpirationPlugin({
         maxEntries: 30,
         maxAgeSeconds: 24 * 60 * 60 // 24 hours
-      }),
-      {
-        handlerDidError: async () => {
-          // Return the cached homepage as a fallback
-          return caches.match('/');
-        }
-      }
-    ],
-    networkTimeoutSeconds: 3
-  })
-);
-
-// Catch-all route as fallback
-workbox.routing.setDefaultHandler(
-  new workbox.strategies.NetworkFirst({
-    cacheName: 'default',
-    plugins: [
-      new workbox.expiration.ExpirationPlugin({
-        maxEntries: 30,
-        maxAgeSeconds: 24 * 60 * 60
-      }),
-      {
-        handlerDidError: async () => {
-          return caches.match('/');
-        }
-      }
+      })
     ]
   })
 );
