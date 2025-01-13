@@ -42,12 +42,12 @@ workbox.routing.registerRoute(
   })
 );
 
-workbox.routing.registerRoute(
-  ({url}) => url.pathname === '/',
-  new workbox.strategies.NetworkFirst({
-    cacheName: 'dynamic-content',
-    matchOptions: {
-      ignoreSearch: false, // Ensures query params are respected
-    },
-  })
-);
+// workbox.routing.registerRoute(
+//   ({url}) => url.pathname === '/',
+//   new workbox.strategies.NetworkFirst({
+//     cacheName: 'dynamic-content',
+//     matchOptions: {
+//       ignoreSearch: false, // Ensures query params are respected
+//     },
+//   })
+// );

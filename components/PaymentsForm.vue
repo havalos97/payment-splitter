@@ -5,6 +5,7 @@
         <h2 class="text-2xl font-semibold mb-4">
           People list
         </h2>
+        {{ route.query.state }}
       </div>
       <div class="flex justify-end">
         <fab
