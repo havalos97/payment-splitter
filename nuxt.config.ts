@@ -55,41 +55,43 @@ export default defineNuxtConfig({
       ],
     },
     workbox: {
+      navigateFallback: '/',
+      globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
       runtimeCaching: [
         {
-          urlPattern: /\/_nuxt\/.*\.js$/, // Cache JS files
-          handler: 'StaleWhileRevalidate',
+          urlPattern: /^https:\/\/nuxt-payment-splitter\.vercel\.app\/.*/, // Adjust this to match your API
+          handler: 'NetworkFirst',
           options: {
-            cacheName: 'nuxt-js-cache',
-            expiration: {
-              maxEntries: 50,
-              maxAgeSeconds: 86400, // Cache for 1 day
+            cacheName: 'app-cache',
+            cacheableResponse: {
+              statuses: [0, 200]
             },
-          },
+            networkTimeoutSeconds: 10
+          }
         },
         {
-          urlPattern: /\/_nuxt\/.*\.css$/, // Cache CSS files
-          handler: 'StaleWhileRevalidate',
-          options: {
-            cacheName: 'nuxt-css-cache',
-            expiration: {
-              maxEntries: 50,
-              maxAgeSeconds: 86400, // Cache for 1 day
-            },
-          },
-        },
-        {
-          urlPattern: /\/$/, // Cache the HTML (root route) page
+          urlPattern: /\.(png|jpg|jpeg|svg|gif)$/,
           handler: 'CacheFirst',
           options: {
-            cacheName: 'html-cache',
+            cacheName: 'image-cache',
             expiration: {
-              maxEntries: 10, // Only keep 1 HTML page in the cache
-              maxAgeSeconds: 86400, // Cache for 1 day
-            },
-          },
+              maxEntries: 60,
+              maxAgeSeconds: 30 * 24 * 60 * 60 // 30 days
+            }
+          }
         },
-      ],
+        {
+          urlPattern: /\.(js|css)$/,
+          handler: 'StaleWhileRevalidate',
+          options: {
+            cacheName: 'static-resources',
+            expiration: {
+              maxEntries: 60,
+              maxAgeSeconds: 30 * 24 * 60 * 60 // 30 days
+            }
+          }
+        }
+      ]
     },
   },
 })
