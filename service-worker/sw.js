@@ -43,8 +43,11 @@ workbox.routing.registerRoute(
 );
 
 workbox.routing.registerRoute(
-  ({url}) => url.pathname === '/' && url.searchParams.has('state'),
+  ({url}) => url.pathname === '/',
   new workbox.strategies.NetworkFirst({
-    cacheName: 'root-state-cache',
+    cacheName: 'dynamic-content',
+    matchOptions: {
+      ignoreSearch: false, // Ensures query params are respected
+    },
   })
 );
