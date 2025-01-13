@@ -3,6 +3,7 @@ import type { ToastPosition } from "~/types/toast.types";
 const showRef = ref<boolean>(false);
 const messageRef = ref<string | null>(null);
 const timeoutRef = ref<number | null>(null);
+const isLinkRef = ref<boolean>(false);
 const toastPositionRef = ref<ToastPosition | null>(null);
 
 /**
@@ -30,6 +31,14 @@ const setToastMessage = (message: string | null) => {
  */
 const setToastTimeout = (timeoutInSeconds: number | null) =>
   timeoutRef.value = (timeoutInSeconds ?? 0) * 1000;
+
+/**
+ * Sets whether the toast message is a link.
+ * 
+ * @param isLink - A boolean indicating whether the toast message is a link.
+ * If true, the message will be displayed as a link.
+ */
+const setToastIsLink = (isLink: boolean) => isLinkRef.value = isLink;
 
 /**
  * Sets the position of the toast.
@@ -61,6 +70,7 @@ const resetToast = () => {
   setToastVisibility(false);
   setToastMessage(null);
   setToastTimeout(null);
+  setToastIsLink(false);
   setToastPosition(null);
 }
 
@@ -68,6 +78,7 @@ export const useToast = () => {
   return {
     show: showRef,
     message: messageRef,
+    isLink: isLinkRef,
     position: toastPositionRef,
     showToast,
     hideToast,
@@ -75,6 +86,7 @@ export const useToast = () => {
     setToastVisibility,
     setToastMessage,
     setToastTimeout,
+    setToastIsLink,
     setToastPosition,
     resetToast,
   };

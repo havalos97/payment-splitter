@@ -41,3 +41,10 @@ workbox.routing.registerRoute(
     ]
   })
 );
+
+workbox.routing.registerRoute(
+  ({url}) => url.pathname === '/' && url.searchParams.has('state'),
+  new workbox.strategies.NetworkFirst({
+    cacheName: 'root-state-cache',
+  })
+);

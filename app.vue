@@ -24,6 +24,8 @@
         v-if="show"
         :message="message ?? ''"
         :position="position ?? ToastPosition.bottomCenter"
+        :is-link="isLink"
+        link-message="Clipboard API unavailable. Click and hold to copy."
         @close="hideToast"
       />
     </Transition>
@@ -45,7 +47,7 @@ const people = ref<Person[]>([
 const showResults = ref(false);
 const results = ref<DebtorType[]>([]);
 
-const { show, message, position, hideToast } = useToast();
+const { show, isLink, message, position, hideToast } = useToast();
 
 const addPerson = () => {
   people.value.push(initialPersonData());

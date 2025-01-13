@@ -122,6 +122,7 @@ const {
   setToastMessage,
   setToastPosition,
   setToastTimeout,
+  setToastIsLink,
 } = useToast();
 
 const showConfirmDeleteModal = ref(false);
@@ -197,14 +198,21 @@ const share = () => {
   if (state) {
     baseURL = `${baseURL}?state=${state}`
   }
-  navigator.clipboard.writeText(baseURL);
-  setToastMessage('Link copied to clipboard');
+  try {
+    navigator.clipboard.writeText(baseURL);
+    setToastMessage('Link copied to clipboard');
+    setToastIsLink(false);
+    setToastTimeout(5);
+  } catch (error) {
+    setToastMessage(baseURL);
+    setToastIsLink(true);
+    setToastTimeout(20);
+  }
   setToastPosition(
     isSm.value
       ? ToastPosition.bottomFullWidth
       : ToastPosition.bottomRight,
   );
-  setToastTimeout(5);
   showToast();
 }
 

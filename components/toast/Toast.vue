@@ -7,8 +7,17 @@
     <div class="flex-shrink-0">
       <info-icon class="w-6 h-6" />
     </div>
-    <div v-if="message" class="ml-3 text-sm font-normal">
+    <div v-if="message && !isLink" class="ml-3 text-sm font-normal">
       {{ message }}
+    </div>
+    <div v-if="isLink" class="ml-3 text-sm font-normal">
+      <a
+        :href="message"
+        class="text-blue-500 hover:underline dark:text-blue-400"
+        @click.prevent="$emit('close')"
+      >
+        {{ props.linkMessage }}
+      </a>
     </div>
     <button
       type="button"
@@ -30,6 +39,8 @@ import { ToastPosition } from '~/types/toast.types';
 const props = defineProps<{
   message: string;
   position: ToastPosition;
+  isLink?: boolean;
+  linkMessage?: string;
 }>();
 
 const positionClasses = {
