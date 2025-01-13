@@ -29,14 +29,12 @@ export default defineNuxtConfig({
   modules: ['@vite-pwa/nuxt'],
   pwa: {
     registerType: 'autoUpdate',
-    devOptions: {
-      enabled: true, // Enables service worker in dev mode for testing
-    },
     manifest: {
       name: 'Payment Splitter',
       short_name: 'PaySplit',
-      description: 'A simple app to split payments',
+      description: 'An app to split payments',
       lang: 'en',
+      scope: '/',
       start_url: '/',
       display: 'standalone',
       background_color: '#f3f4f6',
@@ -56,24 +54,28 @@ export default defineNuxtConfig({
     },
     workbox: {
       navigateFallback: '/',
-      globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
+      globPatterns: [
+        '**/*.{js,css,html,png,svg,ico,woff,woff2,ttf,eot}',
+        'manifest.webmanifest'
+      ],
+      globIgnores: ['_nuxt/_redirect*'],
+      cleanupOutdatedCaches: true,
       runtimeCaching: [
         {
-          urlPattern: /^https:\/\/nuxt-payment-splitter\.vercel\.app\/.*/, // Adjust this to match your API
+          urlPattern: /^\/$/,
           handler: 'NetworkFirst',
           options: {
-            cacheName: 'app-cache',
-            cacheableResponse: {
-              statuses: [0, 200]
-            },
-            networkTimeoutSeconds: 10
+            cacheName: 'start-url',
+            expiration: {
+              maxAgeSeconds: 24 * 60 * 60 // 24 hours
+            }
           }
         },
         {
-          urlPattern: /\.(png|jpg|jpeg|svg|gif)$/,
+          urlPattern: /\.(?:png|jpg|jpeg|svg|gif)$/,
           handler: 'CacheFirst',
           options: {
-            cacheName: 'image-cache',
+            cacheName: 'images',
             expiration: {
               maxEntries: 60,
               maxAgeSeconds: 30 * 24 * 60 * 60 // 30 days
@@ -81,17 +83,46 @@ export default defineNuxtConfig({
           }
         },
         {
-          urlPattern: /\.(js|css)$/,
+          urlPattern: /\.(?:js|css)$/,
           handler: 'StaleWhileRevalidate',
           options: {
-            cacheName: 'static-resources',
+            cacheName: 'assets',
             expiration: {
               maxEntries: 60,
-              maxAgeSeconds: 30 * 24 * 60 * 60 // 30 days
+              maxAgeSeconds: 24 * 60 * 60 // 24 hours
             }
           }
+        },
+        {
+          urlPattern: /\.(?:woff|woff2|ttf|eot)$/,
+          handler: 'CacheFirst',
+          options: {
+            cacheName: 'fonts',
+            expiration: {
+              maxEntries: 10,
+              maxAgeSeconds: 7 * 24 * 60 * 60 // 7 days
+            }
+          }
+        },
+        {
+          urlPattern: /^.*$/,  // Catch-all for HTML routes
+          handler: 'NetworkFirst',
+          options: {
+            cacheName: 'pages',
+            expiration: {
+              maxEntries: 30,
+              maxAgeSeconds: 24 * 60 * 60 // 24 hours
+            },
+            networkTimeoutSeconds: 3
+          }
         }
-      ]
+      ],
     },
+    strategies: 'injectManifest',  // Changed from 'generateSW'
+    srcDir: 'service-worker',
+    filename: 'sw.js',
+    injectManifest: {
+      injectionPoint: undefined
+    }
   },
 })
