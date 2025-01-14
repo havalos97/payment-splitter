@@ -60,6 +60,7 @@
           placeholder="Amount"
           class="border rounded p-2 w-full md:w-36"
           type="number"
+          inputmode="numeric"
           min="0"
           @keydown="formatAmount"
         />
