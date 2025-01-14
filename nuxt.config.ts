@@ -6,7 +6,10 @@ export default defineNuxtConfig({
   app: {
     head: {
       title: 'PaySplit',
-    }
+      link: [
+        {rel: 'manifest', href: '/manifest.webmanifest'},
+      ]
+    },
   },
   components: [
     {

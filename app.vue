@@ -1,6 +1,5 @@
 <template>
   <VitePwaManifest />
-  <link rel="manifest" href="/manifest.webmanifest">
   <div class="min-h-screen print:bg-transparent bg-gray-100 p-6">
     <h1 class="text-3xl font-bold text-center mb-4">
       PaySplit
