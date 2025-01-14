@@ -16,7 +16,7 @@
     <payment-results
       v-else
       :results="results"
-      @reset="reset(false)"
+      @close-results="closeResults"
     />
     <Transition name="fade">
       <toast
@@ -28,6 +28,14 @@
         @close="hideToast"
       />
     </Transition>
+    <confirmation-modal
+      v-if="displayOverwriteDataModal"
+      message="Looks like you already entered some data but someone shared a link with you. Do you want to overwrite the data with the shared one?"
+      yesText="Yes"
+      noText="No"
+      @confirm="useDataFromQuery"
+      @close="useDataFromStore"
+    />
   </div>
 </template>
 
@@ -45,9 +53,11 @@ const people = ref<Person[]>([
 ]);
 const showResults = ref(false);
 const results = ref<DebtorType[]>([]);
+const displayOverwriteDataModal = ref(false);
 
 const { show, isLink, message, position, hideToast } = useToast();
 const route = useRoute();
+const rootStore = useRootStore();
 
 const addPerson = () => {
   people.value.push(initialPersonData());
@@ -75,18 +85,50 @@ const calculateDebts = () => {
   showResults.value = true;
 };
 
-const reset = (wipePeople: boolean) => {
-  if (wipePeople) {
-    people.value = [initialPersonData()];
-    results.value = [];
-  }
+const closeResults = () =>
   showResults.value = false;
+
+const reset = () => {
+  people.value = [initialPersonData()];
+  results.value = [];
+};
+
+const showOverwriteDataModal = () =>
+  displayOverwriteDataModal.value = true;
+
+const hideOverwriteDataModal = () =>
+  displayOverwriteDataModal.value = false;
+
+const useDataFromStore = () => {
+  people.value = rootStore.people.slice();
+  hideOverwriteDataModal();
+}
+
+const useDataFromQuery = () => {
+  const state = decodeQueryData(route.query.state as string);
+  people.value = state?.people as Person[] ?? [initialPersonData()];
+  hideOverwriteDataModal();
+};
+
+const dataOriginManager = () => {
+  const dataFromStore = rootStore.people.length > 0;
+  const dataFromQuery = route.query.state;
+
+  // If someone shared a link with data and the user already entered some data
+  if (dataFromStore && dataFromQuery) {
+    showOverwriteDataModal();
+  }
+  // If the user didn't enter any data and someone shared a link with data
+  else if (!dataFromStore && dataFromQuery) {
+    useDataFromQuery();
+  }
+  // If the user entered some data and no one shared a link with data
+  else if (dataFromStore && !dataFromQuery) {
+    useDataFromStore();
+  }
 };
 
 onMounted(() => {
-  if (route.query.state) {
-    const state = decodeQueryData(route.query.state as string);
-    people.value = state?.people as Person[] ?? [initialPersonData()];
-  }
+  dataOriginManager();
 });
 </script>

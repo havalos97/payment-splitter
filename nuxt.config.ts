@@ -26,7 +26,18 @@ export default defineNuxtConfig({
       autoprefixer: {},
     },
   },
-  modules: ['@vite-pwa/nuxt'],
+  modules: [
+    '@vite-pwa/nuxt',
+    [
+      '@pinia/nuxt',
+      {
+        autoImports: [
+          ['defineStore'],
+        ],
+      },
+    ],
+    'pinia-plugin-persistedstate/nuxt',
+  ],
   pwa: {
     registerType: 'autoUpdate',
     manifest: {

@@ -36,7 +36,7 @@
         <strong>{{ debt.from }}</strong> owes <strong>{{ debt.to }}</strong> ${{ debt.amount }}
       </li>
     </ul>
-    <cta class="print:hidden" full-width @click="emits('reset', false)">
+    <cta class="print:hidden" full-width @click="emits('closeResults')">
       Go back
     </cta>
   </div>
@@ -46,7 +46,7 @@
 import type { DebtorType } from '~/types';
 import { initFlowbite } from 'flowbite';
 
-const emits = defineEmits(['reset']);
+const emits = defineEmits(['closeResults']);
 
 const print = () => window?.print();
 

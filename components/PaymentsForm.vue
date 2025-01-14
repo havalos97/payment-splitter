@@ -107,7 +107,6 @@ import type { PaymentsFormComponentProps } from '~/types/payments-form.types';
 import { initFlowbite } from 'flowbite';
 import { ToastPosition } from '~/types/toast.types';
 import { generateStateUrl } from '~/utils/generateStateUrl';
-import { compressToBase64 } from 'lz-string';
 
 const emits = defineEmits([
   'reset',
@@ -119,7 +118,6 @@ const emits = defineEmits([
 
 const props = defineProps<PaymentsFormComponentProps>();
 
-const route = useRoute();
 const { isSm } = useDevice();
 const {
   showToast,
@@ -128,10 +126,18 @@ const {
   setToastTimeout,
   setToastIsLink,
 } = useToast();
+const rootStore = useRootStore();
 
 const showConfirmDeleteModal = ref(false);
 const showResetConfirmationModal = ref(false);
 const selectedPersonIndex = ref(-1);
+
+watch(() => props.people,
+  () => {
+    rootStore.people = props.people.slice();
+  },
+  { deep: true },
+);
 
 const selectedPersonName = computed(() => props.people.at(selectedPersonIndex.value)?.name);
 const confirmDeleteMessage = computed(() =>
@@ -158,13 +164,6 @@ const confirmReset = () => {
   showResetConfirmationModal.value = false;
 };
 
-const total = computed(() =>
-  props.people.reduce(
-    (sum, person) => sum + (person.amount || 0),
-    0,
-  ),
-);
-
 const formatAmount = (e: KeyboardEvent) =>
   e.key.length === 1 &&
   isNaN(Number(e.key)) &&
@@ -173,7 +172,7 @@ const formatAmount = (e: KeyboardEvent) =>
 const shareState = async () => {
   const sharedUrl = await generateStateUrl({
     people: props.people.map((person) => ({ ...person })),
-    total: total.value,
+    total: props.total,
   });
   try {
     if (navigator.share) {
