@@ -161,6 +161,7 @@ const confirmDeletePerson = () => {
 
 const confirmReset = () => {
   emits('reset', true);
+  rootStore.resetStore();
   showResetConfirmationModal.value = false;
 };
 

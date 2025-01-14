@@ -6,6 +6,12 @@ export const useRootStore = defineStore(rootStoreKey, {
   state: (): RootStoreType => ({
     people: [],
   }),
+  actions: {
+    resetStore() {
+      this.$reset();
+      localStorage.removeItem(rootStoreKey);
+    },
+  },
   persist: {
     storage: piniaPluginPersistedstate.localStorage(),
   }
