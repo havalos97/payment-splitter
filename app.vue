@@ -1,6 +1,6 @@
 <template>
   <VitePwaManifest />
-  <div class="min-h-screen print:bg-transparent bg-gray-100 p-6">
+  <div class="min-h-screen print:bg-transparent bg-[url('/bg_img.jpg')] p-6">
     <h1 class="text-3xl font-bold text-center mb-4">
       PaymentSplitter
     </h1>
@@ -94,3 +94,9 @@ onMounted(() => {
   }
 });
 </script>
+
+<style lang="css">
+.opacity {
+  opacity: 0.1;
+}
+</style>
