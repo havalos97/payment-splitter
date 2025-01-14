@@ -177,7 +177,7 @@ const shareState = async () => {
     if (navigator.share) {
       await navigator.share({
         title: "Review your payments",
-        text: "Check out the payments I've added",
+        text: "",
         url: sharedUrl,
       });
       setToastMessage('Shared successfully');
