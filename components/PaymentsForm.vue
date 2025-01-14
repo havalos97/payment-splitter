@@ -173,8 +173,8 @@ const shareState = async () => {
     people: props.people,
     total: total.value,
   });
-  if (navigator.share) {
-    try {
+  try {
+    if (navigator.share) {
       await navigator.share({
         title: "Review your payments",
         text: "Check out the payments I've added",
@@ -183,16 +183,16 @@ const shareState = async () => {
       setToastMessage('Shared successfully');
       setToastIsLink(false);
       setToastTimeout(5);
-    } catch (error) {
-      setToastMessage(sharedUrl);
-      setToastIsLink(true);
-      setToastTimeout(20);
+    } else {
+      navigator.clipboard.writeText(sharedUrl);
+      setToastMessage('Link copied to clipboard');
+      setToastIsLink(false);
+      setToastTimeout(5);
     }
-  } else {
-    navigator.clipboard.writeText(sharedUrl);
-    setToastMessage('Link copied to clipboard');
-    setToastIsLink(false);
-    setToastTimeout(5);
+  } catch (error) {
+    setToastMessage(sharedUrl);
+    setToastIsLink(true);
+    setToastTimeout(20);
   }
   setToastPosition(
     isSm.value
