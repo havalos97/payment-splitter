@@ -12,7 +12,6 @@
       @remove-person="removePerson"
       @calculate-debts="calculateDebts"
       @reset="reset"
-      @state-from-query="setStateFromQuery"
     />
     <payment-results
       v-else
@@ -48,6 +47,7 @@ const showResults = ref(false);
 const results = ref<DebtorType[]>([]);
 
 const { show, isLink, message, position, hideToast } = useToast();
+const route = useRoute();
 
 const addPerson = () => {
   people.value.push(initialPersonData());
@@ -87,4 +87,10 @@ const setStateFromQuery = (query: string) => {
   const state = decodeQueryData(query);
   people.value = state.people as Person[];
 };
+
+onMounted(() => {
+  if (route.query.state) {
+    setStateFromQuery(route.query.state as string);
+  }
+});
 </script>

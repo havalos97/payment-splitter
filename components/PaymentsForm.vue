@@ -204,8 +204,5 @@ const shareState = async () => {
 
 onMounted(() => {
   initFlowbite();
-  if (route.query.state) {
-    emits('stateFromQuery', route.query.state as string);
-  }
 });
 </script>
