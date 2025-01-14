@@ -7,5 +7,5 @@ export const generateStateUrl = (state: PaymentsFormComponentProps) => {
   if (encodedState) {
     baseURL.searchParams.append('state', encodedState);
   }
-  return baseURL.toString();
+  return decodeURIComponent(baseURL.toString());
 }
