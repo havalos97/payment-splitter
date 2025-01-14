@@ -36,7 +36,7 @@ workbox.routing.registerRoute(
     plugins: [
       new workbox.expiration.ExpirationPlugin({
         maxEntries: 30,
-        maxAgeSeconds: 30 * 24 * 60 * 60 // 30 hours
+        maxAgeSeconds: 30 * 24 * 60 * 60 // 30 days
       })
     ]
   })
@@ -46,8 +46,20 @@ workbox.routing.registerRoute(
   ({url}) => url.pathname === '/',
   new workbox.strategies.NetworkFirst({
     cacheName: 'dynamic-content',
+    plugins: [
+      {
+        cacheKeyWillBeUsed: async ({request}) => {
+          const url = new URL(request.url);
+          return url.pathname + url.search; // Include query parameters in the cache key
+        }
+      },
+      new workbox.expiration.ExpirationPlugin({
+        maxEntries: 30,
+        maxAgeSeconds: 30 * 24 * 60 * 60 // 30 days
+      })
+    ],
     matchOptions: {
-      ignoreSearch: false, // Ensures query params are respected
+      ignoreSearch: false, // Ensure query parameters are respected
     },
   })
 );
