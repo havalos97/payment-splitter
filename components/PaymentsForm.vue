@@ -5,7 +5,6 @@
         <h2 class="text-2xl font-semibold mb-4">
           People list
         </h2>
-        {{ route.query.state }}
       </div>
       <div class="flex justify-end">
         <fab
@@ -26,7 +25,7 @@
         <fab
           class="bg-gray-400 hover:bg-gray-500 dark:bg-gray-400 dark:hover:bg-gray-700"
           data-tooltip-target="share-tooltip"
-          @click="share"
+          @click="shareState"
         >
           <share-nodes-icon class="w-6 h-6 text-red" />
         </fab>
@@ -104,6 +103,7 @@
 import type { PaymentsFormComponentProps } from '~/types/payments-form.types';
 import { initFlowbite } from 'flowbite';
 import { ToastPosition } from '~/types/toast.types';
+import { generateStateUrl } from '~/utils/generateStateUrl';
 
 const emits = defineEmits([
   'reset',
@@ -116,7 +116,6 @@ const emits = defineEmits([
 const props = defineProps<PaymentsFormComponentProps>();
 
 const route = useRoute();
-const router = useRouter();
 const { isSm } = useDevice();
 const {
   showToast,
@@ -167,45 +166,18 @@ const formatAmount = (e: KeyboardEvent) =>
   isNaN(Number(e.key)) &&
   e.preventDefault();
 
-watch(
-  () => props.people.map(
-    (person) => ({ ...person })
-  ),
-  (newPeople) => {
-    const query = route.query;
-    let state = {
-      people: newPeople,
-      total: total.value,
-    };
-    // If there is a state in the query, merge it with the current state
-    if ('state' in query) {
-      const stateFromQuery = decodeQueryData(query.state as string);
-      state = {
-        ...stateFromQuery,
-        ...state,
-      }
-    }
-    const encodedState = encodeQueryData(state);
-    router.push({
-      query: { state: encodedState },
-    });
-  },
-  { deep: true },
-);
-
-const share = () => {
-  const state = route.query.state;
-  let baseURL = `${window.location.origin}${window.location.pathname}`;
-  if (state) {
-    baseURL = `${baseURL}?state=${state}`
-  }
+const shareState = () => {
+  const sharedUrl = generateStateUrl({
+    people: props.people,
+    total: total.value,
+  });
   try {
-    navigator.clipboard.writeText(baseURL);
+    navigator.clipboard.writeText(sharedUrl);
     setToastMessage('Link copied to clipboard');
     setToastIsLink(false);
     setToastTimeout(5);
   } catch (error) {
-    setToastMessage(baseURL);
+    setToastMessage(sharedUrl);
     setToastIsLink(true);
     setToastTimeout(20);
   }
