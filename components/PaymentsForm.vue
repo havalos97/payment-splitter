@@ -107,6 +107,7 @@ import type { PaymentsFormComponentProps } from '~/types/payments-form.types';
 import { initFlowbite } from 'flowbite';
 import { ToastPosition } from '~/types/toast.types';
 import { generateStateUrl } from '~/utils/generateStateUrl';
+import { compressToBase64 } from 'lz-string';
 
 const emits = defineEmits([
   'reset',
@@ -170,8 +171,8 @@ const formatAmount = (e: KeyboardEvent) =>
   e.preventDefault();
 
 const shareState = async () => {
-  const sharedUrl = generateStateUrl({
-    people: props.people,
+  const sharedUrl = await generateStateUrl({
+    people: props.people.map((person) => ({ ...person })),
     total: total.value,
   });
   try {

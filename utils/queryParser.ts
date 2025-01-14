@@ -1,3 +1,4 @@
+import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
 
 /**
  * Encodes a given data object into a base64 string.
@@ -10,12 +11,8 @@
  * @param data - The data object to be encoded. It should be a record with string keys and values of any type.
  * @returns The base64 encoded string representation of the input data.
  */
-export const encodeQueryData = (data: Record<string, unknown>) => {
-  const stringifiedValue = JSON.stringify(data);
-  return typeof window !== 'undefined'
-    ? window.btoa(stringifiedValue)
-    : Buffer.from(stringifiedValue).toString('base64');
-};
+export const encodeQueryData = async (data: Record<string, unknown>) =>
+  compressToEncodedURIComponent(JSON.stringify(data));
 
 /**
  * Decodes a given base64 string into a data object.
@@ -28,8 +25,5 @@ export const encodeQueryData = (data: Record<string, unknown>) => {
  * @param data - The base64 encoded string to be decoded.
  * @returns The data object decoded from the input base64 string.
  */
-export const decodeQueryData = (data: string): Record<string, unknown> => {
-  return typeof window !== 'undefined'
-    ? JSON.parse(window.atob(data))
-    : JSON.parse(Buffer.from(data, 'base64').toString('utf-8'));
-}
+export const decodeQueryData = (data: string): Record<string, unknown> =>
+  JSON.parse(decompressFromEncodedURIComponent(data));

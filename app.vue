@@ -83,20 +83,10 @@ const reset = (wipePeople: boolean) => {
   showResults.value = false;
 };
 
-const setStateFromQuery = (query: string) => {
-  const state = decodeQueryData(query);
-  people.value = state.people as Person[];
-};
-
 onMounted(() => {
   if (route.query.state) {
-    setStateFromQuery(route.query.state as string);
+    const state = decodeQueryData(route.query.state as string);
+    people.value = state?.people as Person[] ?? [initialPersonData()];
   }
 });
 </script>
-
-<style lang="css">
-.opacity {
-  opacity: 0.1;
-}
-</style>
