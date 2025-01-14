@@ -3,7 +3,7 @@
     <div class="grid grid-cols-2 gap-4 mb-4">
       <div>
         <h2 class="text-2xl font-semibold mb-4">
-          People list
+          People
         </h2>
       </div>
       <div class="flex justify-end">
@@ -74,12 +74,14 @@
     <div class="mt-4 text-lg font-semibold">
       Total: <span class="text-green-600">${{ total }}</span>
     </div>
-    <cta class="my-4" @click="emits('calculateDebts')" full-width>
-      Calculate
-    </cta>
-    <cta-outlined class="my-4" @click="showResetConfirmationModal = true" full-width>
-      Clear all
-    </cta-outlined>
+    <div class="grid grid-cols-1 md:grid-cols-2 md:gap-4">
+      <cta-outlined class="my-4" @click="showResetConfirmationModal = true" full-width>
+        Clear all
+      </cta-outlined>
+      <cta class="my-4" @click="emits('calculateDebts')" full-width>
+        Calculate
+      </cta>
+    </div>
   </div>
   <confirmation-modal
     v-if="showResetConfirmationModal"
@@ -166,20 +168,31 @@ const formatAmount = (e: KeyboardEvent) =>
   isNaN(Number(e.key)) &&
   e.preventDefault();
 
-const shareState = () => {
+const shareState = async () => {
   const sharedUrl = generateStateUrl({
     people: props.people,
     total: total.value,
   });
-  try {
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: "Review your payments",
+        text: "Check out the payments I've added",
+        url: sharedUrl,
+      });
+      setToastMessage('Shared successfully');
+      setToastIsLink(false);
+      setToastTimeout(5);
+    } catch (error) {
+      setToastMessage(sharedUrl);
+      setToastIsLink(true);
+      setToastTimeout(20);
+    }
+  } else {
     navigator.clipboard.writeText(sharedUrl);
     setToastMessage('Link copied to clipboard');
     setToastIsLink(false);
     setToastTimeout(5);
-  } catch (error) {
-    setToastMessage(sharedUrl);
-    setToastIsLink(true);
-    setToastTimeout(20);
   }
   setToastPosition(
     isSm.value

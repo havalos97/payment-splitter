@@ -5,7 +5,7 @@ export default defineNuxtConfig({
   ssr: true,
   app: {
     head: {
-      title: 'PaySplit',
+      title: 'PaymentSplitter',
     },
   },
   components: [
@@ -32,7 +32,7 @@ export default defineNuxtConfig({
     manifest: {
       name: 'Payment Splitter',
       short_name: 'PaySplit',
-      description: 'An app to split payments',
+      description: 'An app to split payments between friends',
       lang: 'en',
       scope: '/',
       start_url: '/',

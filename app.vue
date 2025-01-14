@@ -2,7 +2,7 @@
   <VitePwaManifest />
   <div class="min-h-screen print:bg-transparent bg-gray-100 p-6">
     <h1 class="text-3xl font-bold text-center mb-4">
-      PaySplit
+      PaymentSplitter
     </h1>
     <payments-form
       v-if="!showResults"
