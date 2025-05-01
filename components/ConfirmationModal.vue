@@ -12,7 +12,7 @@
           @click="$emit('close')"
         >
           <close-icon />
-          <span class="sr-only">Cerrar ventana emergente</span>
+          <span class="sr-only">Close pop-up window</span>
         </button>
         <div class="p-4 md:p-5 text-center">
           <error-icon class="mx-auto mb-4 text-blue-500 w-12 h-12 dark:text-blue-300" />

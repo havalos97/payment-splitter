@@ -1,7 +1,15 @@
 import type { PaymentsFormComponentProps } from "~/types/payments-form.types";
 import { encodeState } from "./encodeState";
 
-export const generateStateUrl = async (state: PaymentsFormComponentProps) => {
+type GenerateUrlToShareParams = PaymentsFormComponentProps & {
+  groupId: string | null;
+};
+
+export const generateUrlToShare = async (state: GenerateUrlToShareParams) => {
+  if (state.groupId) {
+    const encodedGroupId = encodeString(state.groupId);
+    return `${window.location.origin}${window.location.pathname}?groupId=${encodedGroupId}`;
+  }
   const encodedState = await encodeState(state);
   const baseURL = new URL(`${window.location.origin}${window.location.pathname}`);
   if (encodedState) {

@@ -10,7 +10,9 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@nuxtjs/supabase": "^1.5.0",
     "@pinia/nuxt": "^0.9.0",
+    "@supabase/supabase-js": "^2.49.4",
     "@vite-pwa/nuxt": "0.10.6",
     "@vueuse/core": "^12.4.0",
     "flowbite": "^2.5.2",

@@ -4,6 +4,7 @@ export const rootStoreKey = 'root-store';
 
 export const useRootStore = defineStore(rootStoreKey, {
   state: (): RootStoreType => ({
+    groupId: null,
     people: [],
   }),
   actions: {

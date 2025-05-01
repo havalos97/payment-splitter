@@ -106,7 +106,7 @@
 import type { PaymentsFormComponentProps } from '~/types/payments-form.types';
 import { initFlowbite } from 'flowbite';
 import { ToastPosition } from '~/types/toast.types';
-import { generateStateUrl } from '~/utils/generateStateUrl';
+import { generateUrlToShare } from '~/utils/generateUrlToShare';
 
 const emits = defineEmits([
   'reset',
@@ -171,37 +171,37 @@ const formatAmount = (e: KeyboardEvent) =>
   e.preventDefault();
 
 const shareState = async () => {
-  const sharedUrl = await generateStateUrl({
+  const sharedUrl = await generateUrlToShare({
     people: props.people.map((person) => ({ ...person })),
     total: props.total,
+    groupId: rootStore.groupId,
   });
   try {
+    setToastMessage('Shared successfully, the link was copied to clipboard');
+    setToastIsLink(false);
+    setToastTimeout(10);
     if (navigator.share) {
       await navigator.share({
         title: "Review your payments",
         text: "",
         url: sharedUrl,
       });
-      setToastMessage('Shared successfully');
-      setToastIsLink(false);
-      setToastTimeout(5);
-    } else {
-      navigator.clipboard.writeText(sharedUrl);
-      setToastMessage('Link copied to clipboard');
-      setToastIsLink(false);
-      setToastTimeout(5);
     }
   } catch (error) {
-    setToastMessage(sharedUrl);
-    setToastIsLink(true);
-    setToastTimeout(20);
+    if (!/Share canceled/i.test(error as string)) {
+      setToastMessage(sharedUrl);
+      setToastIsLink(true);
+      setToastTimeout(20);
+    }
+  } finally {
+    await window.navigator.clipboard.writeText(sharedUrl)
+    setToastPosition(
+      isSm.value
+        ? ToastPosition.bottomFullWidth
+        : ToastPosition.bottomRight,
+    );
+    showToast();
   }
-  setToastPosition(
-    isSm.value
-      ? ToastPosition.bottomFullWidth
-      : ToastPosition.bottomRight,
-  );
-  showToast();
 }
 
 onMounted(() => {

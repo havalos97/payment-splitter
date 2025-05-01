@@ -36,34 +36,73 @@
       @confirm="useDataFromQuery"
       @close="useDataFromStore"
     />
+    <confirmation-modal
+      v-if="groupNotFound"
+      message="This group was not found. Please check the link or create a new group."
+      yes-text="Create new group"
+      no-text="Go back"
+      @confirm="createGroupModalCb"
+      @close="groupNotFound = false"
+    />
   </div>
 </template>
 
 <script lang="ts" setup>
-import type { DebtorType, Person } from './types';
-import { ToastPosition } from './types/toast.types';
+import type { DebtorType, Person } from '~/types';
+import { ToastPosition } from '~/types/toast.types';
 
 const initialPersonData = () => ({
   name: "",
   amount: 0,
 } as Person);
 
+const {
+  createGroupInDb,
+  updatePeopleListInDb,
+  getGroupById,
+} = useGroup();
+
 const people = ref<Person[]>([
   initialPersonData(),
 ]);
+const groupNotFound = ref(false);
 const showResults = ref(false);
 const results = ref<DebtorType[]>([]);
 const displayOverwriteDataModal = ref(false);
 
 const { show, isLink, message, position, hideToast } = useToast();
 const route = useRoute();
+const router = useRouter();
 const rootStore = useRootStore();
 
-const addPerson = () => {
-  people.value.push(initialPersonData());
+const createGroup = async () => {
+  const data = await createGroupInDb();
+  if (!data) return;
+  rootStore.groupId = data.id;
+  router.replace({
+    path: route.path,
+    query: {
+      ...route.query,
+      groupId: rootStore.groupId,
+    },
+  });
 };
 
-const removePerson = (index: number) => {
+const addPerson = async () => {
+  people.value.push(initialPersonData());
+  if (people.value.length > 1) {
+    await updatePeopleListInDb({
+      groupId: rootStore.groupId ?? '',
+      people: people.value.filter((person) => person.name !== ''),
+    });
+  }
+};
+
+const removePerson = async (index: number) => {
+  updatePeopleListInDb({
+    groupId: rootStore.groupId ?? '',
+    people: people.value.filter((person) => person.name !== ''),
+  });
   if (people.value.length === 1) return;
   people.value.splice(index, 1);
 };
@@ -82,7 +121,16 @@ const calculateDebts = () => {
   });
   if (!debtors) return;
   results.value = debtors;
+  updatePeopleListInDb({
+    groupId: rootStore.groupId ?? '',
+    people: people.value.filter((person) => person.name !== ''),
+  });
   showResults.value = true;
+};
+
+const createGroupModalCb = () => {
+  createGroup();
+  groupNotFound.value = false;
 };
 
 const closeResults = () =>
@@ -128,7 +176,22 @@ const dataOriginManager = () => {
   }
 };
 
-onMounted(() => {
+onMounted(async () => {
   dataOriginManager();
+  if (route.query.groupId) {
+    const groupId = route.query?.groupId as string ?? '';
+    const response = await getGroupById(groupId);
+    if (!response) {
+      groupNotFound.value = true;
+      return;
+    };
+    rootStore.groupId = response.id;
+    rootStore.people = response.people;
+    if (response.people.length > 0) {
+      people.value = response.people;
+    }
+  } else if (!rootStore.groupId) {
+    createGroup();
+  }
 });
 </script>
