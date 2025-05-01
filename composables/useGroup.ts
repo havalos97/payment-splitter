@@ -63,7 +63,10 @@ export const useGroup = () => {
       console.error('Error fetching group:', error);
       return null;
     }
-    return data as CreateGroupResponse;
+    return {
+      ...data,
+      id: encodeString(data.id),
+    } as CreateGroupResponse;
   }
 
   return {
