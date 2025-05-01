@@ -7,8 +7,7 @@ type GenerateUrlToShareParams = PaymentsFormComponentProps & {
 
 export const generateUrlToShare = async (state: GenerateUrlToShareParams) => {
   if (state.groupId) {
-    const encodedGroupId = encodeString(state.groupId);
-    return `${window.location.origin}${window.location.pathname}?groupId=${encodedGroupId}`;
+    return `${window.location.origin}${window.location.pathname}?groupId=${state.groupId}`;
   }
   const encodedState = await encodeState(state);
   const baseURL = new URL(`${window.location.origin}${window.location.pathname}`);
